@@ -17,13 +17,13 @@ public class FileUtil {
         }
     }
 
-    public static List<Integer> readSensorIdsFromFile(String filename) {
-        List<Integer> sensors = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+    public static List<Long> readSensorsFromFile(String fileName) {
+        List<Long> sensors = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 try {
-                    sensors.add(Integer.parseInt(line.trim()));
+                    sensors.add(Long.parseLong(line.trim()));
                 } catch (NumberFormatException ignored) {}
             }
         } catch (IOException e) {
@@ -32,13 +32,20 @@ public class FileUtil {
         return sensors;
     }
 
-    public static List<String> parseNodes(String line) {
-        String[] parts = line.split(",");
+    public static List<String> parseNodesFromFile(String fileName) {
         List<String> nodes = new ArrayList<>();
-        for (String part : parts) {
-            part = part.trim();
-            if (!part.contains(":")) part += ":" + DEFAULT_PORT;
-            nodes.add(part);
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if(line.isEmpty() || line.charAt(0) == '#') {
+                    continue;
+                }
+                if (!line.contains(":")) line += ":" + DEFAULT_PORT;
+                nodes.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return nodes;
     }
@@ -54,8 +61,8 @@ public class FileUtil {
         }
     }
 
-    public static void writeBucketStats(String filename, Map<String, Map<Integer, Integer>> nodeBucketSensorCount) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+    public static void writeBucketStats(String fileName, Map<String, Map<Integer, Integer>> nodeBucketSensorCount) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             for (String node : nodeBucketSensorCount.keySet()) {
                 Map<Integer, Integer> bucketMap = nodeBucketSensorCount.get(node);
                 List<Integer> counts = new ArrayList<>(bucketMap.values());
@@ -77,33 +84,33 @@ public class FileUtil {
     }
 
     public static void printSimpleStats(Map<String, Integer> nodeToSensorCount) {
-    System.out.println("=== Simple Consistent Hashing Stats ===");
-    for (Map.Entry<String, Integer> entry : nodeToSensorCount.entrySet()) {
-        System.out.println("Node: " + entry.getKey());
-        System.out.println("  Sensor Count: " + entry.getValue());
+        System.out.println("=== Simple Consistent Hashing Stats ===");
+        for (Map.Entry<String, Integer> entry : nodeToSensorCount.entrySet()) {
+            System.out.println("Node: " + entry.getKey());
+            System.out.println("  Sensor Count: " + entry.getValue());
+        }
+        System.out.println("========================================");
     }
-    System.out.println("========================================");
-}
 
-public static void printBucketStats(Map<String, Map<Integer, Integer>> nodeBucketSensorCount) {
-    System.out.println("=== Bucket-Based Consistent Hashing Stats ===");
-    for (String node : nodeBucketSensorCount.keySet()) {
-        Map<Integer, Integer> bucketMap = nodeBucketSensorCount.get(node);
-        List<Integer> counts = new ArrayList<>(bucketMap.values());
+    public static void printBucketStats(Map<String, Map<Integer, Integer>> nodeBucketSensorCount) {
+        System.out.println("=== Bucket-Based Consistent Hashing Stats ===");
+        for (String node : nodeBucketSensorCount.keySet()) {
+            Map<Integer, Integer> bucketMap = nodeBucketSensorCount.get(node);
+            List<Integer> counts = new ArrayList<>(bucketMap.values());
 
-        int min = counts.stream().mapToInt(i -> i).min().orElse(0);
-        int max = counts.stream().mapToInt(i -> i).max().orElse(0);
-        double avg = counts.stream().mapToInt(i -> i).average().orElse(0);
-        double std = calculateStdDev(counts, avg);
+            int min = counts.stream().mapToInt(i -> i).min().orElse(0);
+            int max = counts.stream().mapToInt(i -> i).max().orElse(0);
+            double avg = counts.stream().mapToInt(i -> i).average().orElse(0);
+            double std = calculateStdDev(counts, avg);
 
-        System.out.println("Node: " + node);
-        System.out.printf("  Minimum sensors per bucket: %d\n", min);
-        System.out.printf("  Maximum sensors per bucket: %d\n", max);
-        System.out.printf("  Average sensors per bucket: %.2f\n", avg);
-        System.out.printf("  Std deviation of sensors per bucket: %.2f\n\n", std);
+            System.out.println("Node: " + node);
+            System.out.printf("  Minimum sensors per bucket: %d\n", min);
+            System.out.printf("  Maximum sensors per bucket: %d\n", max);
+            System.out.printf("  Average sensors per bucket: %.2f\n", avg);
+            System.out.printf("  Std deviation of sensors per bucket: %.2f\n\n", std);
+        }
+        System.out.println("=============================================");
     }
-    System.out.println("=============================================");
-}
 
 
     private static double calculateStdDev(List<Integer> values, double mean) {

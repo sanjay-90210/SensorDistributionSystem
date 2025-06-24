@@ -1,7 +1,7 @@
 package yourpackage;
 
 public class HashFunctionFactory {
-    public static Hashfunction getHashFunction(String type) {
+    public static HashFunction getHashFunction(String type) {
         if ("murmur".equalsIgnoreCase(type)) {
             return new MurmurHashFunction();
         }

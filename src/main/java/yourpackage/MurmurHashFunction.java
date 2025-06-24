@@ -1,7 +1,7 @@
 package yourpackage;
 import java.nio.charset.StandardCharsets;
 
-public class MurmurHashFunction implements Hashfunction {
+public class MurmurHashFunction implements HashFunction {
 
     @Override
     public int hash(Object key) {

@@ -3,5 +3,7 @@ package yourpackage;
 import java.util.List;
 
 public interface ConsistentHashing {
-    void consistentHashing(List<Integer> sensors);
+    void hashNodes(List<String> nodes);
+    void hashSensors(List<Long> sensors);
+    void printStats();
 }

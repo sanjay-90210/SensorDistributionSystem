@@ -4,13 +4,13 @@ import java.util.*;
 public class ConsistentHashRing {
     private final TreeMap<Integer, String> ring = new TreeMap<>();
     private final int VIRTUAL_NODES = 1000;
-    private final Hashfunction hashFunction;
+    private final HashFunction hashFunction;
 
     public int getRingSize() {
     return ring.size();
 }
 
-    public ConsistentHashRing(List<String> nodes, Hashfunction hashFunction) {
+    public ConsistentHashRing(List<String> nodes, HashFunction hashFunction) {
         this.hashFunction = hashFunction;
         for (String node : nodes) {
             for (int i = 0; i < VIRTUAL_NODES; i++) {

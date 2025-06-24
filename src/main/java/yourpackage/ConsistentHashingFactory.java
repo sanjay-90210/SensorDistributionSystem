@@ -3,27 +3,19 @@ package yourpackage;
 import java.util.Properties;
 
 public class ConsistentHashingFactory {
-    public static void getConsistentHashing(Properties props) {
-        String mode = props.getProperty("ConsistentHashingMode", "simple").toLowerCase();
-
-        switch (mode) {
+    public static ConsistentHashing getConsistentHashing(String type, Properties props) {
+        switch (type) {
             case "simple":
-                System.out.println("Factory: Using SimpleConsistentHashing");
-                new SimpleConsistentHashing(props).run();
-                break;
+                return new SimpleConsistentHashing(props);
 
             case "bucket":
-                System.out.println("Factory: Using BucketBasedConsistentHashing");
-                new BucketBasedConsistentHashing(props).run();
-                break;
+                return new BucketBasedConsistentHashing(props);
 
             case "baseline":
-                System.out.println("Factory: Using Baseline");
-                new Baseline(props).run();
-                break;
+                return new BaselineConsistentHashing(props);
 
             default:
-                throw new IllegalArgumentException("Unknown mode: " + mode);
+                throw new IllegalArgumentException("Unknown type: " + type);
         }
     }
 }
